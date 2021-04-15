@@ -9,7 +9,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract HelpiLocker is Ownable{
     using SafeMath for uint256;
-    
+    using SafeERC20 for IERC20;
+
     struct Items {
         IERC20 token;
         address withdrawer;
@@ -27,12 +28,12 @@ contract HelpiLocker is Ownable{
     mapping (address => mapping(address => uint256)) public walletTokenBalance;
     
     uint256 public taxPermille = 2;
-    address public helpiMarkingAddress;
+    address public helpiMarketingAddress;
     
     event Withdraw(address withdrawer, uint256 amount);
     
-    constructor(address _helpiMarkingAddress) {
-        helpiMarkingAddress = _helpiMarkingAddress;
+    constructor(address _helpiMarketingAddress) {
+        helpiMarketingAddress = _helpiMarketingAddress;
     }
     
     function lockTokens(IERC20 _token, address _withdrawer, uint256 _amount, uint256 _unlockTimestamp) external returns (uint256 _id) {
@@ -43,7 +44,7 @@ contract HelpiLocker is Ownable{
         _token.safeTransferFrom(msg.sender, address(this), _amount);
         
         uint256 tax = _amount.mul(taxPermille).div(1000);
-        _token.safeTransfer(helpiMarkingAddress, tax);
+        _token.safeTransfer(helpiMarketingAddress, tax);
         
         walletTokenBalance[address(_token)][msg.sender] = walletTokenBalance[address(_token)][msg.sender].add(_amount.sub(tax));
         
@@ -84,7 +85,7 @@ contract HelpiLocker is Ownable{
         lockedToken[_id].token.safeTransferFrom(msg.sender, address(this), lockedToken[_id].amount);
         
         uint256 tax = lockedToken[_id].amount.mul(lockedToken[_id].taxPermille).div(1000);
-        lockedToken[_id].token.safeTransfer(helpiMarkingAddress, tax);
+        lockedToken[_id].token.safeTransfer(helpiMarketingAddress, tax);
         
         walletTokenBalance[address(lockedToken[_id].token)][msg.sender] = walletTokenBalance[address(lockedToken[_id].token)][msg.sender].add(lockedToken[_id].amount.sub(tax));
         
@@ -108,8 +109,8 @@ contract HelpiLocker is Ownable{
         lockedToken[_id].token.safeTransfer(msg.sender, lockedToken[_id].amount);
     }
     
-    function setHelpiMarkingAddress(address _helpiMarkingAddress) external onlyOwner {
-        helpiMarkingAddress = _helpiMarkingAddress;
+    function setHelpiMarketingAddress(address _helpiMarketingAddress) external onlyOwner {
+        helpiMarketingAddress = _helpiMarketingAddress;
     }
     
     function getDepositsByTokenAddress(address _token) view external returns (uint256[] memory) {

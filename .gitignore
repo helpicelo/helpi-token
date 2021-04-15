@@ -1,3 +1,4 @@
 .secret
+secrets.json
 node_modules/
 build/

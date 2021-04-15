@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+
+
+
+
 
 interface IFactory {
     function createPair(address tokenA, address tokenB) external returns (address pair);
@@ -62,8 +62,8 @@ contract CeloHelpi is IERC20, Ownable {
         transfer(stakingAddress, 210000 ether);
         transfer(marketingAddress, 70000 ether);
         
-        address pairAddress = IFactory(_factoryAddress).createPair(_weth, address(this));
-        excludeFromRewards(pairAddress);
+        // address pairAddress = IFactory(_factoryAddress).createPair(_weth, address(this));
+        // excludeFromRewards(pairAddress);
     }
 
     function totalSupply() external pure override returns (uint256) {
@@ -278,3 +278,5 @@ contract CeloHelpi is IERC20, Ownable {
         return (rewardsSupply, actualSupply);
     }
 }
+
+

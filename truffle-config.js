@@ -31,9 +31,16 @@ const kit = Kit.newKit('https://alfajores-forno.celo-testnet.org')
 const getAccount = require('./getAccount').getAccount
 
 async function awaitWrapper() {
-    let account = await getAccount()
-    kit.connection.addAccount(account.privateKey)
+    let accounts = await getAccount()
+        // console.log('cuentas:', accounts)
+
+
+    Object.values(accounts).forEach(acc => {
+        kit.connection.addAccount(acc.privateKey)
+    })
+    kit.connection.defaultAccount = accounts.main.address
 }
+
 awaitWrapper()
 
 module.exports = {

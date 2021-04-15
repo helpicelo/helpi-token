@@ -4,24 +4,45 @@ const path = require('path')
 var web3 = new Web3()
 
 
-const filePath = path.join(__dirname, './.secret')
+const objectMap = (obj, fn) =>
+    Object.fromEntries(
+        Object.entries(obj).map(
+            ([k, v], i) => [k, fn(v, k, i)]
+        )
+    )
+
+const filePath = path.join(__dirname, './secrets.json')
 
 function getAccount() {
     return new Promise(resolve => {
         if (fs.existsSync(filePath)) {
             fs.readFile(filePath, { encoding: 'utf-8' }, (err, data) => {
-                resolve(web3.eth.accounts.privateKeyToAccount(data))
+                const keys = JSON.parse(data)
+
+                const accounts = objectMap(keys, key => web3.eth.accounts.privateKeyToAccount(key))
+
+                resolve(accounts)
             })
         } else {
-            let randomAccount = web3.eth.accounts.create()
 
-            fs.writeFile(filePath, randomAccount.privateKey, (err) => {
+            const accounts = {
+                "main": web3.eth.accounts.create(),
+                "liquidity": web3.eth.accounts.create(),
+                "staking": web3.eth.accounts.create(),
+                "marketing": web3.eth.accounts.create(),
+                "factory": web3.eth.accounts.create(),
+                "weth": web3.eth.accounts.create(),
+            }
+
+            const data = JSON.stringify(objectMap(accounts, v => v.privateKey))
+
+            fs.writeFile(filePath, data, (err) => {
                 if (err) {
                     return console.log(err);
                 }
             })
 
-            resolve(randomAccount)
+            resolve(accounts)
         }
     })
 }
