@@ -2,14 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v3.4/contracts/token/ERC20/IERC20.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v3.4/contracts/token/ERC20/SafeERC20.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v3.4/contracts/math/SafeMath.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v3.4/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract WaultLocker is Ownable{
+contract HelpiLocker is Ownable{
     using SafeMath for uint256;
-    using SafeERC20 for IERC20;
     
     struct Items {
         IERC20 token;
@@ -28,12 +27,12 @@ contract WaultLocker is Ownable{
     mapping (address => mapping(address => uint256)) public walletTokenBalance;
     
     uint256 public taxPermille = 2;
-    address public waultMarkingAddress;
+    address public helpiMarkingAddress;
     
     event Withdraw(address withdrawer, uint256 amount);
     
-    constructor(address _waultMarkingAddress) {
-        waultMarkingAddress = _waultMarkingAddress;
+    constructor(address _helpiMarkingAddress) {
+        helpiMarkingAddress = _helpiMarkingAddress;
     }
     
     function lockTokens(IERC20 _token, address _withdrawer, uint256 _amount, uint256 _unlockTimestamp) external returns (uint256 _id) {
@@ -44,7 +43,7 @@ contract WaultLocker is Ownable{
         _token.safeTransferFrom(msg.sender, address(this), _amount);
         
         uint256 tax = _amount.mul(taxPermille).div(1000);
-        _token.safeTransfer(waultMarkingAddress, tax);
+        _token.safeTransfer(helpiMarkingAddress, tax);
         
         walletTokenBalance[address(_token)][msg.sender] = walletTokenBalance[address(_token)][msg.sender].add(_amount.sub(tax));
         
@@ -85,7 +84,7 @@ contract WaultLocker is Ownable{
         lockedToken[_id].token.safeTransferFrom(msg.sender, address(this), lockedToken[_id].amount);
         
         uint256 tax = lockedToken[_id].amount.mul(lockedToken[_id].taxPermille).div(1000);
-        lockedToken[_id].token.safeTransfer(waultMarkingAddress, tax);
+        lockedToken[_id].token.safeTransfer(helpiMarkingAddress, tax);
         
         walletTokenBalance[address(lockedToken[_id].token)][msg.sender] = walletTokenBalance[address(lockedToken[_id].token)][msg.sender].add(lockedToken[_id].amount.sub(tax));
         
@@ -109,8 +108,8 @@ contract WaultLocker is Ownable{
         lockedToken[_id].token.safeTransfer(msg.sender, lockedToken[_id].amount);
     }
     
-    function setWaultMarkingAddress(address _waultMarkingAddress) external onlyOwner {
-        waultMarkingAddress = _waultMarkingAddress;
+    function setHelpiMarkingAddress(address _helpiMarkingAddress) external onlyOwner {
+        helpiMarkingAddress = _helpiMarkingAddress;
     }
     
     function getDepositsByTokenAddress(address _token) view external returns (uint256[] memory) {
