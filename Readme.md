@@ -13,7 +13,9 @@ $ npx truffle compile
 ```
 
 Contracts migration:
+
 ```bash
 $ npx truffle migrate --network alfajores
-``
+```
+
 the file `secrets.json` track the private keys of the different accounts, you need to change or add Cellos to make a first deployment.
