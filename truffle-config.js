@@ -26,13 +26,13 @@
 
 
 const Kit = require('@celo/contractkit')
-const kit = Kit.newKit('https://alfajores-forno.celo-testnet.org')
+const kit = Kit.newKit('https://forno.celo.org')
 
 const getAccount = require('./getAccount').getAccount
 
 async function awaitWrapper() {
     let accounts = await getAccount()
-        // console.log('cuentas:', accounts)
+    // console.log('cuentas:', accounts)
 
 
     Object.values(accounts).forEach(acc => {
@@ -99,6 +99,10 @@ module.exports = {
         alfajores: {
             provider: kit.connection.web3.currentProvider, // CeloProvider
             network_id: 44787 // latest Alfajores network id
+        },
+        mainnet: {
+            provider: kit.connection.web3.currentProvider,
+            network_id: 42220
         }
     },
 
